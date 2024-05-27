@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles/style.css">
+    <title>Socket.IO Chat</title>
+</head>
+<body>
+    <div id="messages"></div>
+    <form id="message_form">
+        <input type="text" name="msg" id="msg_input">
+        <button type="submit">Enviar</button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('update_messages', (messages) => {
+            updateMessagesOnScreen(messages);
+        });
+
+        function updateMessagesOnScreen(messages) {
+            const div_messages = document.getElementById('messages');
+            let list_messages = '<ul>';
+            messages.forEach(message => {
+                list_messages += `<li>${message}</li>`;
+            });
+            list_messages += '</ul>';
+            div_messages.innerHTML = list_messages;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('message_form');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const message = document.getElementById('msg_input').value;
+                document.getElementById('msg_input').value = '';
+                socket.emit('new_message', { msg: message });
+            });
+        });
+    </script>
+</body>
+</html>
